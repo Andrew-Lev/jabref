@@ -48,6 +48,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.actions.Actions;
+import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.TextField;
@@ -150,6 +151,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
     private EntryType entryType;
+    private SourceTab sourceTab;
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry, String lastTabName) {
         this.frame = frame;
@@ -219,7 +221,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public synchronized void listen(FieldAddedOrRemovedEvent event) {
         // other field deleted -> update other fields tab
         if (OtherFieldsTab.isOtherField(entryType, event.getFieldName())) {
-            rebuildOtherFieldsTab();
+            DefaultTaskExecutor.runInJavaFXThread(() -> rebuildOtherFieldsTab());
         }
     }
 
@@ -329,11 +331,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         // Special tabs
         tabs.add(new MathSciNetTab(entry));
-        tabs.add(new FileAnnotationTab(entry, this, panel.getAnnotationCache()));
+        tabs.add(new FileAnnotationTab(panel.getAnnotationCache(), entry));
         tabs.add(new RelatedArticlesTab(entry));
 
         // Source tab
-        SourceTab sourceTab = new SourceTab(panel, entry, movingToDifferentEntry);
+        sourceTab = new SourceTab(panel, entry, movingToDifferentEntry);
         tabs.add(sourceTab);
 
         tabbed.getTabs().clear();
@@ -523,7 +525,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void unregisterListeners() {
+        this.entry.unregisterListener(this);
+        if (sourceTab != null) {
+            this.sourceTab.deregisterListeners();
+        }
         removeSearchListeners();
+
     }
 
     private void showChangeEntryTypePopupMenu() {

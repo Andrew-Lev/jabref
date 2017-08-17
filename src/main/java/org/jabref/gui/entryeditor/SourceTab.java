@@ -70,15 +70,23 @@ public class SourceTab extends EntryEditorTab {
     @Subscribe
     public void listen(EntryChangedEvent event) {
         if (codeArea != null && this.entry.equals(event.getBibEntry())) {
-            try {
-                codeArea.clear();
-                codeArea.appendText(getSourceString(entry, mode));
-            } catch (IOException ex) {
-                codeArea.appendText(ex.getMessage() + "\n\n" +
-                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-                codeArea.setEditable(false);
-                LOGGER.debug("Incorrect entry", ex);
-            }
+            DefaultTaskExecutor.runInJavaFXThread(() -> updateSourcePane());
+        }
+    }
+
+    public void deregisterListeners() {
+        this.entry.unregisterListener(this);
+    }
+
+    private void updateSourcePane() {
+        try {
+            codeArea.clear();
+            codeArea.appendText(getSourceString(entry, mode));
+        } catch (IOException ex) {
+            codeArea.appendText(ex.getMessage() + "\n\n" +
+                    Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+            codeArea.setEditable(false);
+            LOGGER.debug("Incorrect entry", ex);
         }
     }
 
@@ -97,9 +105,7 @@ public class SourceTab extends EntryEditorTab {
         // store source if new entry is selected in the maintable and the source tab is focused
         EasyBind.subscribe(movingToDifferentEntry, newEntrySelected -> {
             if (newEntrySelected && codeArea.focusedProperty().get()) {
-                DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    storeSource();
-                });
+                DefaultTaskExecutor.runInJavaFXThread(() -> storeSource());
             }
         });
 
