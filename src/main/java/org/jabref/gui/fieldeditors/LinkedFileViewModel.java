@@ -175,7 +175,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("Cancel"));
 
             if (confirm) {
-                pdfCleanup.cleanup(entry);
+                Path targetFilePath = file.get().getParent().resolve(targetFileName);
+                if (!Files.exists(targetFilePath)) {
+                    pdfCleanup.cleanup(entry);
+                } else {
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("File already exists"),
+                            Localization.lang("File '%0' already exists.", targetFilePath.toString()));
+                }
             }
         } else {
             dialogService.showErrorDialogAndWait(

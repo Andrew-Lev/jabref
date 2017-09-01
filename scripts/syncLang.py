@@ -11,7 +11,7 @@ import logger
 
 RES_DIR = "src/main/resources/l10n"
 STATUS_FILE = "status.md"
-URL_BASE = "https://github.com/JabRef/jabref/tree/master/"
+URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n/"
 
 
 def get_current_branch():
@@ -419,7 +419,8 @@ def status_create_markdown():
 
     markdown = []
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    markdown.append("### Localization files status ({date} - Branch `{branch}` `{hash}`)\n".format(date=date, branch=get_current_branch(), hash=get_current_hash_short()))
+    markdown.append("### Localization files status ({date} - Branch `{branch}` `{hash}`)\n\n".format(date=date, branch=get_current_branch(), hash=get_current_hash_short()))
+    markdown.append("Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n")
 
     write_properties(property_files=get_all_jabref_properties())
     write_properties(property_files=get_all_menu_properties())

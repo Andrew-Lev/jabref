@@ -31,6 +31,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where a new protected terms list was not available immediately after its addition. [#3161](https://github.com/JabRef/jabref/issues/3161)
 - We fixed an issue where an online file link could not be removed from an entry [#3165](https://github.com/JabRef/jabref/issues/3165)
 - We fixed an issue where an online file link did not open the browser and created an error [#3165](https://github.com/JabRef/jabref/issues/3165)
+- We fixed an issue where attempting to rename a linked file would fail without notifying the user about the failure [#3172] (https://github.com/JabRef/jabref/issues/3172) 
 
 ### Removed
 
